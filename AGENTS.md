@@ -7,9 +7,10 @@ Python application to help find the best glasses price in Brazil by sending What
 ## Tech Stack
 
 - **Language**: Python 3.11+
-- **Automation**: Playwright (WhatsApp Web)
+- **Automation**: Playwright (WhatsApp Web) & Evolution API (HTTP Backend)
 - **Web Framework**: FastAPI (for optional web UI)
 - **Data Storage**: JSON file (simple, no database needed)
+- **Containerization**: Docker (for Evolution API)
 - **CLI**: Click
 - **Testing**: pytest
 - **Linting**: ruff
@@ -32,8 +33,14 @@ playwright install chromium
 ### Running the Application
 
 ```bash
-# CLI - send message to all stores
+# CLI - send message to all stores (default: Playwright)
 python -m otica_scripts.cli send "Olá, gostaria de saber o preço de um óculos de grau"
+
+# CLI - send message via Evolution API (Recommended for performance)
+python -m otica_scripts.cli send "Olá" --provider evolution
+
+# CLI - test with one store using Evolution API
+python -m otica_scripts.cli send --test "Teste" --provider evolution
 
 # CLI - add a new store
 python -m otica_scripts.cli add-store --name "Ótica Central" --phone "+5511999999999"

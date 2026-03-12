@@ -43,6 +43,28 @@ python -m otica_scripts.web_ui
    - **Gerar Links WhatsApp**: Crie links para enviar mensagens manualmente
    - **Acompanhar Respostas**: Marque quando uma loja responder
 
+### Evolution API via Docker (Mais Rápido e Estável)
+Para envio invisível via HTTP:
+1. Suba o container da API (Versão 1.8.2 recomendada por estabilidade):
+```bash
+docker run -d --name evolution-api \
+  --restart always \
+  -p 8080:8080 \
+  -e SERVER_URL=http://localhost:8080 \
+  -e DOCKER_ENV=true \
+  -e AUTHENTICATION_TYPE=apikey \
+  -e AUTHENTICATION_API_KEY=sua_chave_aqui \
+  -v evolution_instances:/evolution/instances \
+  atendai/evolution-api:v1.8.2
+```
+2. Adicione ao `.env`: 
+   ```env
+   WHATSAPP_PROVIDER=evolution
+   EVOLUTION_API_KEY=sua_chave_aqui
+   ```
+3. Ao enviar pela primeira vez, escaneie o código QR gerado no terminal.
+
+
 ### Linha de Comando
 
 #### Adicionar uma loja
@@ -67,14 +89,26 @@ name,phone,instagram
 Ótica Brasil,5593992222222
 ```
 
-#### Enviar mensagem para todas as lojas
+#### Enviar mensagem
+
+##### CLI - Enviar mensagem para todas as lojas (padrão: Playwright)
 ```bash
-python -m otica_scripts.cli send "Olá! Gostaria de saber o preço de um óculos de grau."
+python -m otica_scripts.cli send "Mensagem"
 ```
 
-#### Testar com 1 loja apenas
+##### CLI - Enviar mensagem via Evolution API (Profissional/Docker)
+```bash
+python -m otica_scripts.cli send "Mensagem" --provider evolution
+```
+
+##### CLI - Testar com 1 loja apenas (Playwright)
 ```bash
 python -m otica_scripts.cli send --test "Mensagem de teste"
+```
+
+##### CLI - Testar com 1 loja apenas (Evolution API)
+```bash
+python -m otica_scripts.cli send --test "Teste" --provider evolution
 ```
 
 #### Ver sem enviar (dry-run)
