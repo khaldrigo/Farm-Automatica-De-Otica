@@ -1,6 +1,7 @@
 import click
 
-from otica_scripts.config import MAX_MESSAGE_LENGTH
+from otica_scripts.config import MAX_MESSAGE_LENGTH, WHATSAPP_PROVIDER
+from otica_scripts.evolution_sender import EvolutionSender
 from otica_scripts.message_tracker import MessageManager
 from otica_scripts.scraper import GoogleSearchScraper
 from otica_scripts.store import StoreManager
@@ -52,7 +53,13 @@ def list_stores() -> None:
 @click.argument("message")
 @click.option("--dry-run", is_flag=True, help="Show which stores would receive the message")
 @click.option("--test", "test_mode", is_flag=True, help="Send to only 1 store (for testing)")
-def send(message: str, dry_run: bool, test_mode: bool) -> None:
+@click.option(
+    "--provider",
+    type=click.Choice(["playwright", "evolution"]),
+    default=WHATSAPP_PROVIDER,
+    help="Which provider to use for sending (default from env)",
+)
+def send(message: str, dry_run: bool, test_mode: bool, provider: str) -> None:
     """Send a message to all stores."""
     if len(message) > MAX_MESSAGE_LENGTH:
         click.echo(f"Error: Message exceeds {MAX_MESSAGE_LENGTH} characters")
@@ -79,19 +86,30 @@ def send(message: str, dry_run: bool, test_mode: bool) -> None:
     click.echo(f"{'='*50}")
     click.echo(f"Total stores: {len(stores)}")
     click.echo(f"Message: {message[:50]}...")
+    click.echo(f"Provider: {provider}")
     click.echo(f"{'='*50}\n")
 
-    sender = WhatsAppSender()
+    if provider == "evolution":
+        sender: EvolutionSender | WhatsAppSender = EvolutionSender()
+    else:
+        sender = WhatsAppSender()
+
     try:
         click.echo("\nOpening WhatsApp Web...")
         whatsapp_ok = sender.open_whatsapp()
 
         if not whatsapp_ok:
             click.echo("\n❌ FAILED: Could not connect to WhatsApp Web")
-            click.echo("Please make sure:")
-            click.echo("  1. You're connected to the internet")
-            click.echo("  2. QR code was scanned successfully")
-            click.echo("  3. Try again\n")
+            if provider == "playwright":
+                click.echo("Please make sure:")
+                click.echo("  1. You're connected to the internet")
+                click.echo("  2. QR code was scanned successfully")
+                click.echo("  3. Try again\n")
+            else:
+                click.echo("Please make sure:")
+                click.echo("  1. Docker containers are running (docker-compose up -d)")
+                click.echo("  2. You scanned the QR code via terminal")
+                click.echo("  3. API Key is correct\n")
             return
 
         results = sender.send_to_all(stores, message)

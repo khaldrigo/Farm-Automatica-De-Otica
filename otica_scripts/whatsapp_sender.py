@@ -65,7 +65,7 @@ class WhatsAppSender:
 
     def open_whatsapp(self) -> bool:
         self._ensure_browser()
-        
+
         if self.context is None and self.browser is None:
             print("ERROR: No browser context available")
             return False
@@ -77,39 +77,45 @@ class WhatsAppSender:
                     print("Using existing WhatsApp Web tab...")
                     return True
 
-        current_context = self.context if self.context else self.browser.new_context()
+        current_context = self.context
+        if current_context is None:
+            if self.browser is not None:
+                current_context = self.browser.new_context()
+            else:
+                return False
+
         self.page = current_context.new_page()
-        
+
         print("Opening WhatsApp Web...")
         print("NOTE: If QR code appears, please scan it within 60 seconds")
         self.page.goto("https://web.whatsapp.com/")
-        
+
         time.sleep(5)
-        
+
         try:
             self.page.wait_for_load_state("domcontentloaded", timeout=30000)
             print("Page loaded, checking for WhatsApp...")
         except Exception as e:
             print(f"Warning: {e}")
-        
+
         try:
             self.page.wait_for_selector('[data-tab]', timeout=30000)
             print("WhatsApp is ready!")
             return True
         except Exception:
             pass
-        
+
         try:
             self.page.wait_for_selector('div[contenteditable="true"]', timeout=30000)
             print("WhatsApp input detected - ready to send!")
             return True
         except Exception:
             pass
-            
+
         if self.page.url and "whatsapp.com" in self.page.url:
             print("WhatsApp page opened - continuing anyway")
             return True
-            
+
         print("ERROR: Could not connect to WhatsApp Web")
         return False
 
