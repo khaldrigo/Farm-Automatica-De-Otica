@@ -37,3 +37,9 @@ session.json
 # Data files (personal)
 data/stores.json
 data/messages.json
+
+# Docker data
+postgres_data/
+redis_data/
+evolution_instances/
+evolution_store/
