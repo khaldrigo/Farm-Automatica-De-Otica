@@ -1,23 +1,23 @@
-# Changelog - Evolution API Integration
+# Changelog - Integração Evolution API
 
-All notable changes to this project during the Evolution API implementation.
+Todas as mudanças notáveis para este projeto durante a implementação da Evolution API.
 
-## [1.1.0] - 2026-03-12
+## [1.1.0] - 12/03/2026
 
-### Added
-- **Evolution API Integration**: Added support for sending WhatsApp messages via HTTP API using the Evolution API backend.
-- **New Provider System**: CLI now supports `--provider evolution` and `--provider playwright` (default).
-- **Docker Support**: Added `docker-compose.yml` and optimized `docker run` instructions for Evolution API v1.8.2.
-- **Auto-Pairing**: Support for scanning QR codes directly from the terminal for the API provider.
-- **Environment Variables**: New configuration options in `.env.example` for API URL, Key, and Instance name.
-- **Tests**: Added tests for the `EvolutionSender` implementation.
+### Adicionado
+- **Integração com Evolution API**: Adicionado suporte para envio de mensagens via API HTTP usando o backend da Evolution API.
+- **Novo Sistema de Provedores**: O CLI agora suporta `--provider evolution` e `--provider playwright` (padrão).
+- **Suporte Docker**: Adicionado `docker-compose.yml` e instruções otimizadas de `docker run` para Evolution API v1.8.2.
+- **Pareamento Automático**: Suporte para escanear QR Codes diretamente pelo terminal no provedor de API.
+- **Variáveis de Ambiente**: Novas opções de configuração no `.env.example` para URL da API, Chave e Nome da Instância.
+- **Testes**: Adicionados testes para a implementação do `EvolutionSender`.
 
-### Fixed
-- **Docker Permissions**: Resolved permission issues with the Docker socket on Linux.
-- **Type Hinting**: Improved type hinting in `whatsapp_sender.py` for Playwright browser context.
-- **Compatibility**: Reached a stable state using Evolution API v1.8.2 to avoid OCI manifest errors in older Docker environments.
+### Corrigido
+- **Permissões Docker**: Resolvido problemas de permissão com o socket do Docker no Linux.
+- **Tipagem (Type Hinting)**: Melhorada a tipagem em `whatsapp_sender.py` para o contexto do navegador Playwright.
+- **Compatibilidade**: Alcançado estado estável usando Evolution API v1.8.2 para evitar erros de manifesto OCI em ambientes Docker mais antigos.
 
-### Updated
-- **CLI**: Optimized `send` command with test mode and provider selection.
-- **Documentation**: Comprehensive updates to `README.md` and `AGENTS.md` covering the new professional backend.
-- **Git**: Added Docker data volumes and session files to `.gitignore`.
+### Atualizado
+- **CLI**: Comando `send` otimizado com modo de teste e seleção de provedor.
+- **Documentação**: Atualizações abrangentes no `README.md` e `AGENTS.md` cobrindo o novo backend profissional.
+- **Git**: Adicionados volumes de dados do Docker e arquivos de sessão ao `.gitignore`.
