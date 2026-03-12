@@ -151,17 +151,26 @@ LOG_LEVEL=INFO
 
 ### Executar testes
 ```bash
-pytest
+# Todos os testes (incluindo integração WhatsApp)
+pytest -v
+
+# Apenas testes de unidade específicos
+pytest tests/test_store.py
 ```
 
-### Verificar tipos
+### Integridade de Dados
+O sistema utiliza **gravações atômicas**. Ao salvar lojas ou mensagens, os arquivos são escritos primeiro em um local temporário e depois substituídos, garantindo que o banco de dados JSON nunca seja corrompido por falhas durante a escrita.
+
+### Verificar tipos e estilo
 ```bash
+# Verificação estrita de tipos
 mypy otica_scripts/
-```
 
-### Verificar estilo
-```bash
-ruff check .
+# Linting e auto-fix
+ruff check --fix .
+
+# Formatação automática
+ruff format .
 ```
 
 ## Notas

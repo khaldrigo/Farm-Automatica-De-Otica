@@ -208,7 +208,7 @@ LOG_LEVEL=INFO
 
 4. **Session management**: Save Playwright session to avoid QR code scan every time
 
-5. **Data persistence**: Auto-save store list after every modification
+5. **Data persistence**: Auto-save store list after every modification using **atomic writes** (write to temp file then replace) to prevent data corruption.
 
 ---
 

@@ -40,8 +40,20 @@ class MessageManager:
         return [SentMessage.from_dict(m) for m in data]
 
     def _save_messages(self, messages: list[SentMessage]) -> None:
-        with open(self.data_file, "w") as f:
+        import os
+        import tempfile
+
+        temp_dir = self.data_file.parent
+        with tempfile.NamedTemporaryFile("w", dir=temp_dir, delete=False, encoding="utf-8") as f:
             json.dump([m.to_dict() for m in messages], f, indent=2, ensure_ascii=False)
+            tempname = f.name
+
+        try:
+            os.replace(tempname, self.data_file)
+        except Exception:
+            if os.path.exists(tempname):
+                os.unlink(tempname)
+            raise
 
     def add_message(self, store_name: str, store_phone: str, message: str) -> SentMessage:
         messages = self._load_messages()

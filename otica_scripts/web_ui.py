@@ -37,8 +37,9 @@ async def home(request: Request) -> HTMLResponse:
     stores = store_manager.get_all_stores()
     messages = msg_manager.get_latest_message_per_store()
     return templates.TemplateResponse(
+        request,
         "index.html",
-        {"request": request, "stores": stores, "messages": messages}
+        {"stores": stores, "messages": messages}
     )
 
 

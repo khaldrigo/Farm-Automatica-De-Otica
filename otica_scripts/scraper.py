@@ -33,18 +33,27 @@ class GoogleSearchScraper:
         self.page.wait_for_timeout(2000)
 
     def _extract_phone_from_text(self, text: str) -> str | None:
+        # Normalize text by removing common separators
+        normalized = text.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+
+        # Ignore 0800 numbers
+        if "0800" in normalized:
+            return None
+
+        # Look for 10 or 11 digits (with or without 55 prefix)
         patterns = [
-            r'\+55(\d{10,11})',
-            r'\((\d{2,3})\)\s*(\d{4,5})-(\d{4})',
-            r'(\d{2,3})\s*(\d{4,5})\s*(\d{4})',
+            r'55(\d{10,11})', # With 55
+            r'(\d{10,11})',   # Without 55 (assumes local)
         ]
+
         for pattern in patterns:
-            match = re.search(pattern, text.replace(" ", "").replace("-", ""))
+            match = re.search(pattern, normalized)
             if match:
-                digits = re.sub(r'\D', '', match.group(0))
-                if digits.startswith("55"):
+                digits = match.group(0)
+                if digits.startswith("55") and len(digits) >= 12:
                     return f"+{digits}"
-                return f"+55{digits}"
+                if len(digits) >= 10:
+                    return f"+55{digits}"
         return None
 
     def scrape_optical_stores(self, location: str = "ótica Santarém Pará Brasil", search_engine: str = "bing") -> list[dict]:

@@ -2,6 +2,21 @@
 
 Todas as mudanças notáveis para este projeto durante a implementação da Evolution API.
 
+## [1.2.0] - 12/03/2026
+
+### Adicionado
+- **Suíte de Testes Abrangente**: Alcançado 100% de sucesso em 36 testes, incluindo CLI, Scraper, Message Tracker e Web UI.
+- **Teste de Integração Playwright**: Implementado teste completo de envio de WhatsApp usando `route.fulfill` para simular o DOM do WhatsApp Web com precisão.
+- **Gravação Atômica de Arquivos**: Implementado sistema de salvamento seguro em `StoreManager` e `MessageManager` usando arquivos temporários e substituição atômica para evitar corrupção de dados.
+
+### Corrigido
+- **Warning de Depreciação**: Corrigido o uso de `TemplateResponse` no FastAPI em `web_ui.py`.
+- **Robustez do Scraper**: Melhorada a extração de números de telefone para ignorar 0800 e lidar com formatos variados.
+- **Estilo de Código**: Resolvido múltiplos problemas de linting e tipagem em todo o projeto.
+
+### Atualizado
+- **Documentação de Testes**: Instruções atualizadas para execução de testes e verificação de estabilidade.
+
 ## [1.1.0] - 12/03/2026
 
 ### Adicionado

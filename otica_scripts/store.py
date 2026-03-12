@@ -55,8 +55,20 @@ class StoreManager:
         return [Store.from_dict(s) for s in data]
 
     def _save_stores(self, stores: list[Store]) -> None:
-        with open(self.data_file, "w") as f:
+        import os
+        import tempfile
+
+        temp_dir = self.data_file.parent
+        with tempfile.NamedTemporaryFile("w", dir=temp_dir, delete=False, encoding="utf-8") as f:
             json.dump([s.to_dict() for s in stores], f, indent=2, ensure_ascii=False)
+            tempname = f.name
+
+        try:
+            os.replace(tempname, self.data_file)
+        except Exception:
+            if os.path.exists(tempname):
+                os.unlink(tempname)
+            raise
 
     def add_store(self, name: str, phone: str, address: str | None = None, instagram: str | None = None) -> Store:
         stores = self._load_stores()
