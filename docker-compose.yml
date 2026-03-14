@@ -1,23 +1,70 @@
 version: '3.8'
 
 services:
-  evolution-api:
-    image: atendai/evolution-api:v1.8.2
-    container_name: evolution-api
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: buscai_postgres
     restart: always
     ports:
-      - "8080:8080"
+      - "5432:5432"
     environment:
-      - SERVER_URL=http://localhost:8080
-      - DOCKER_ENV=true
-      - AUTHENTICATION_TYPE=${AUTHENTICATION_TYPE:-apikey}
-      - AUTHENTICATION_API_KEY=${AUTHENTICATION_API_KEY:-sua_api_key_global}
-      - LOG_LEVEL=ERROR,WARN,DEBUG,INFO,LOG,VERBOSE,DARK,WEBHOOKS
-      - LOG_COLOR=true
-      - CACHE_REDIS_ENABLED=false
-      - DATABASE_ENABLED=false
+      - POSTGRES_USER=buscai
+      - POSTGRES_PASSWORD=buscai
+      - POSTGRES_DB=buscai
     volumes:
-      - evolution_instances:/evolution/instances
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U buscai"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: buscai_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: buscai_api
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://buscai:buscai@postgres:5432/buscai
+      - REDIS_URL=redis://redis:6379/0
+      - AI_PROVIDER=${AI_PROVIDER:-ollama}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://localhost:11434}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - CITY_NAME=${CITY_NAME:-Santarém}
+      - CITY_SLUG=${CITY_SLUG:-santarem}
+      - CITY_STATE=${CITY_STATE:-PA}
+      - SECRET_KEY=${SECRET_KEY:-change-me-in-production}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-60}
+      - STORAGE_BUCKET_URL=${STORAGE_BUCKET_URL:-}
+      - STORAGE_ACCESS_KEY=${STORAGE_ACCESS_KEY:-}
+      - STORAGE_SECRET_KEY=${STORAGE_SECRET_KEY:-}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
 volumes:
-  evolution_instances:
+  postgres_data:
